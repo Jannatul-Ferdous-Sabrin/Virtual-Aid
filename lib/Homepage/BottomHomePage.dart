@@ -6,7 +6,7 @@ import '../Doctor Appoinment/HomeScreen.dart';
 
 class BottomHomePage extends StatelessWidget {
   List<FeaturesList> featuresList = [
-    FeaturesList('assets/BloodBank.jpg', 'Blood Bank', (context) {
+    FeaturesList('assets/blood-bank-dir.png', 'Blood Bank', (context) {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) {
@@ -59,9 +59,35 @@ class BottomHomePage extends StatelessWidget {
                 color: Theme.of(context).primaryColor.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Text(
-                'Fade-in logo of our project added here',
-                textAlign: TextAlign.center,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Color(0xFF3B8EF7),
+                            Color(0xFFA7BFE8),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                  const Center(
+                    child: Text(
+                      'Virtual Aid',
+                      style: TextStyle(
+                        fontSize: 35,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 20),
@@ -97,7 +123,12 @@ class BottomHomePage extends StatelessWidget {
                               //     .primaryContainer
                               //     .withOpacity(0.4),
                             ),
-                            child: Image.asset(featuresList[index].icon),
+                            child: Image.asset(
+                              featuresList[index].icon,
+                              height: 160,
+                              width: 160,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                         Text(featuresList[index].name),

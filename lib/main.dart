@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:ytlogin/Doctor%20Appoinment/HomeScreen.dart';
+import '/Doctor Appoinment/HomeScreen.dart';
 //import 'Homepage/BottomMenuPage.dart';
 import 'Authentication/AuthPage.dart';
 import 'Homepage/HomePage.dart';

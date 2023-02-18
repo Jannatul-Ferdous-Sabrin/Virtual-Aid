@@ -9,7 +9,7 @@ import 'Utils.dart';
 class LoginWidget extends StatefulWidget {
   final VoidCallback onClickedSignUp;
 
-  const LoginWidget({
+  LoginWidget({
     Key? key,
     required this.onClickedSignUp,
   }) : super(key: key);
@@ -19,6 +19,21 @@ class LoginWidget extends StatefulWidget {
 }
 
 class _LoginWidgetState extends State<LoginWidget> {
+  // final _formKey = GlobalKey<FormState>();
+
+  // String _userEmail = '';
+  // String _userPassword = '';
+
+  // void _trySubmit() {
+  //   final isValid = _formKey.currentState!.validate();
+
+  //   if (isValid) {
+  //     _formKey.currentState!.save();
+  //     print(_userEmail);
+  //     print(_userPassword);
+  //   }
+  // }
+
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -37,17 +52,18 @@ class _LoginWidgetState extends State<LoginWidget> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color.fromRGBO(215, 117, 255, 1).withOpacity(0.5),
-                  Color.fromRGBO(255, 188, 117, 1).withOpacity(0.9),
+                  const Color.fromRGBO(215, 117, 255, 1).withOpacity(0.5),
+                  const Color.fromRGBO(255, 188, 117, 1).withOpacity(0.9),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                stops: [0, 1],
+                stops: const [0, 1],
               ),
             ),
           ),
           SingleChildScrollView(
             child: Container(
+              //key: _formKey,
               height: deviceSize.height,
               width: deviceSize.width,
               child: Column(
@@ -56,15 +72,15 @@ class _LoginWidgetState extends State<LoginWidget> {
                 children: <Widget>[
                   Flexible(
                     child: Container(
-                      margin: EdgeInsets.only(bottom: 50.0),
-                      padding:
-                          EdgeInsets.symmetric(vertical: 8.0, horizontal: 94.0),
+                      margin: const EdgeInsets.only(bottom: 50.0),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 94.0),
                       transform: Matrix4.rotationZ(-8 * pi / 180)
                         ..translate(-10.0),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
                         color: Colors.lightBlue.shade900,
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
                             blurRadius: 8,
                             color: Colors.black26,
@@ -85,31 +101,53 @@ class _LoginWidgetState extends State<LoginWidget> {
                   ),
                   TextFormField(
                     controller: emailController,
+                    validator: (value) {
+                      if (value!.isEmpty || value.contains('@')) {
+                        return 'Please enter a valid Email Address.';
+                      } else {
+                        return null;
+                      }
+                    },
                     decoration: InputDecoration(
                       labelText: 'Email',
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 1.5, color: Colors.black),
+                        borderSide:
+                            const BorderSide(width: 1.5, color: Colors.black),
                         borderRadius: BorderRadius.circular(50.0),
                       ),
                     ),
+                    //   onSaved: (value) {
+                    //     _userEmail = value!;
+                    //   },
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 20),
                   TextFormField(
+                    validator: (value) {
+                      if (value!.isEmpty || value.length < 7) {
+                        return 'Password must be at least 7 characters long';
+                      } else {
+                        return null;
+                      }
+                    },
                     controller: passwordController,
                     decoration: InputDecoration(
                       labelText: 'Password',
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 1.5, color: Colors.black),
+                        borderSide:
+                            const BorderSide(width: 1.5, color: Colors.black),
                         borderRadius: BorderRadius.circular(50.0),
                       ),
                     ),
+                    // onSaved: (value) {
+                    //   _userPassword = value!;
+                    // },
                   ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size.fromHeight(40),
                     ),
-                    icon: Icon(Icons.lock_open, size: 32),
-                    label: Text(
+                    icon: const Icon(Icons.lock_open, size: 32),
+                    label: const Text(
                       'Sign In',
                       style: TextStyle(fontSize: 24),
                     ),
