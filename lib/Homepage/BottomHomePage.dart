@@ -15,7 +15,8 @@ class BottomHomePage extends StatelessWidget {
         ),
       );
     }),
-    FeaturesList('assets/BloodBank.jpg', 'Doctor Appoinment', (context) {
+    FeaturesList('assets/medical-appointment.png', 'Doctor Appoinment',
+        (context) {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) {
@@ -24,7 +25,7 @@ class BottomHomePage extends StatelessWidget {
         ),
       );
     }),
-    FeaturesList('assets/BloodBank.jpg', 'Create a Case', (context) {
+    FeaturesList('assets/case-study.png', 'Create a Case', (context) {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) {
@@ -33,7 +34,7 @@ class BottomHomePage extends StatelessWidget {
         ),
       );
     }),
-    FeaturesList('assets/BloodBank.jpg', 'Ambulance', (context) {
+    FeaturesList('assets/ambulance.png', 'Ambulance', (context) {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) {
