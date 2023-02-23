@@ -97,7 +97,7 @@ class DoctorDetails extends StatelessWidget {
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: NetworkImage(
-                      doctorDetails['doctorImage'][0],
+                      doctorDetails['doctorImage'],
                     ),
                     fit: BoxFit.fill,
                   ),

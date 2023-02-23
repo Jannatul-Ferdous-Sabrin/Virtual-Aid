@@ -1,48 +1,63 @@
 import 'package:flutter/material.dart';
 import '../Ambulance/AmbulanceHome.dart';
 import '../Blood Bank/BloodHome.dart';
-import '../CreateCase/CaseHome.dart';
+import '../MedicineReminder/MedicineReminder.dart';
 import '../Doctor Appoinment/HomeScreen.dart';
 
 class BottomHomePage extends StatelessWidget {
   List<FeaturesList> featuresList = [
-    FeaturesList('assets/blood-bank-dir.png', 'Blood Bank', (context) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) {
-            return BloodHome();
-          },
-        ),
-      );
-    }),
-    FeaturesList('assets/medical-appointment.png', 'Doctor Appoinment',
-        (context) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) {
-            return HomeScreen();
-          },
-        ),
-      );
-    }),
-    FeaturesList('assets/case-study.png', 'Create a Case', (context) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) {
-            return CaseHome();
-          },
-        ),
-      );
-    }),
-    FeaturesList('assets/ambulance.png', 'Ambulance', (context) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) {
-            return AmbulanceHome();
-          },
-        ),
-      );
-    }),
+    FeaturesList(
+      'assets/blood-bank-dir.png',
+      'Blood Bank',
+      (context) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) {
+              return BloodHome();
+            },
+          ),
+        );
+      },
+    ),
+    FeaturesList(
+      'assets/medical-appointment.png',
+      'Doctor Appoinment',
+      (context) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) {
+              return HomeScreen();
+            },
+          ),
+        );
+      },
+    ),
+    FeaturesList(
+      'assets/medicinereminder.png',
+      'Medicine Reminder',
+      (context) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) {
+              return MedicineReminder();
+            },
+          ),
+        );
+      },
+    ),
+    FeaturesList(
+      'assets/ambulance.png',
+      'Ambulance',
+      (context) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) {
+              return AmbulanceHome();
+            },
+          ),
+        );
+      },
+    ),
   ];
 
   @override

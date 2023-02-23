@@ -1,12 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'SearchList.dart';
 import 'AppointmentList.dart';
 import 'AllDoctorList.dart';
 import 'speDoctorList.dart';
 import 'HosDoctorList.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   List specialistName = [
     'Dental',
     'Heart',
@@ -28,66 +35,86 @@ class HomeScreen extends StatelessWidget {
     'Heart-Foundation',
   ];
 
-  List<Icon> hospitalsIcon = const [
-    Icon(MdiIcons.hospitalBoxOutline, color: Colors.blue, size: 30),
-    Icon(MdiIcons.hospitalBoxOutline, color: Colors.blue, size: 30),
-    Icon(MdiIcons.hospitalBoxOutline, color: Colors.blue, size: 30),
-    Icon(MdiIcons.hospitalBoxOutline, color: Colors.blue, size: 30),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!;
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4EE),
+      endDrawer: Drawer(
+        child: Container(
+          color: Colors.blue.withOpacity(0.8),
+          child: ListView(
+            children: [
+              ListTile(
+                leading: const Icon(MdiIcons.doctor),
+                title: const Text(
+                  "List All Doctors",
+                  style: TextStyle(
+                    fontSize: 21,
+                    color: Colors.white,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AllDoctorList(),
+                    ),
+                  );
+                },
+              ),
+              const Divider(color: Colors.black),
+              ListTile(
+                leading: const Icon(MdiIcons.note),
+                title: const Text(
+                  "Your Appointments",
+                  style: TextStyle(
+                    fontSize: 21,
+                    color: Colors.white,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppointmentList(),
+                    ),
+                  );
+                },
+              ),
+              const Divider(color: Colors.black),
+              ListTile(
+                leading: const Icon(MdiIcons.heart),
+                title: const Text(
+                  "Favorites",
+                  style: TextStyle(
+                    fontSize: 21,
+                    color: Colors.white,
+                  ),
+                ),
+                onTap: () {},
+              ),
+              const Divider(color: Colors.black),
+            ],
+          ),
+        ),
+      ),
       appBar: AppBar(
         title: const Text('Doctor Appointment'),
-        actions: [
-          PopupMenuButton<int>(
-            color: const Color.fromARGB(255, 204, 200, 200),
-            icon: const Icon(Icons.menu),
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
-              const PopupMenuItem<int>(
-                value: 0,
-                child: Text('List All Doctors'),
-              ),
-              const PopupMenuItem<int>(
-                value: 1,
-                child: Text('Your Appointments'),
-              ),
-              const PopupMenuItem<int>(
-                value: 2,
-                child: Text('Favorites Doctors'),
-              ),
-            ],
-            onSelected: (int value) {
-              if (value == 0) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AllDoctorList()),
-                );
-              }
-              if (value == 1) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AppointmentList()),
-                );
-              }
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Stack(
           children: [
             Container(
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 4.0,
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.8),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
+              height: MediaQuery.of(context).size.height / 4.5,
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 59, 112, 161),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(40),
+                  bottomRight: Radius.circular(40),
                 ),
               ),
             ),
@@ -104,7 +131,7 @@ class HomeScreen extends StatelessWidget {
                           radius: 30,
                           //backgroundImage: AssetImage('User Photo from Firebase'),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 10),
                         Row(
                           children: [
                             const Text(
@@ -114,35 +141,33 @@ class HomeScreen extends StatelessWidget {
                                 fontSize: 18,
                               ),
                             ),
-                            Text(
-                              user.email!,
-                              style: const TextStyle(
-                                fontSize: 24,
+                            Transform.translate(
+                              offset: const Offset(0, 15),
+                              child: Text(
+                                user.email!,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 15),
-                        Container(
-                          margin: const EdgeInsets.only(top: 10, bottom: 10),
-                          width: MediaQuery.of(context).size.width,
-                          height: 55,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: "   Search for Doctors......",
-                              hintStyle: TextStyle(
-                                color: Colors.black.withOpacity(0.3),
-                              ),
-                              prefixIcon: const Icon(
-                                Icons.search,
-                                size: 20,
-                              ),
+                        const SizedBox(height: 20),
+                        Transform.translate(
+                          offset: const Offset(300, 0),
+                          child: IconButton(
+                            color: Colors.red,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SearchList(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(
+                              MdiIcons.magnify,
+                              size: 30,
                             ),
                           ),
                         ),

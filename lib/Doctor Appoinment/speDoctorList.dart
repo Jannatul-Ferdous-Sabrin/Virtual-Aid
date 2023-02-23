@@ -1,13 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'AddDoctor.dart';
 import 'DoctorDetails.dart';
 
 class speDoctorList extends StatefulWidget {
   final String specialistName;
-  speDoctorList({required this.specialistName});
-
+  speDoctorList({
+    required this.specialistName,
+  });
   @override
   State<speDoctorList> createState() => _speDoctorListState();
 }
@@ -80,55 +82,95 @@ class _speDoctorListState extends State<speDoctorList> {
                     child: Container(
                       height: 120,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(20),
                         color: Colors.white60,
                       ),
-                      child: Row(
-                        //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              snapshot.data!.docs[index]['doctorImage'][0],
-                              height: 120,
-                              width: 120,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Stack(
+                        children: [
+                          Row(
                             children: <Widget>[
-                              Text(
-                                snapshot.data!.docs[index]['name'],
-                                style: const TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  snapshot.data!.docs[index]['doctorImage'],
+                                  height: 120,
+                                  width: 120,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
-                              Text(
-                                snapshot.data!.docs[index]['specialist'],
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  //fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                snapshot.data!.docs[index]['hospital'],
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  //fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                snapshot.data!.docs[index]['age'].toString(),
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  //fontWeight: FontWeight.bold,
-                                ),
+                              const SizedBox(width: 20),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    snapshot.data!.docs[index]['name'],
+                                    style: const TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    snapshot.data!.docs[index]['specialist'],
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                  Text(
+                                    snapshot.data!.docs[index]['hospital'],
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                  Text(
+                                    snapshot.data!.docs[index]['age']
+                                        .toString(),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
+                          if (FirebaseAuth.instance.currentUser!.email ==
+                              'admin@gmail.com')
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('Delete Doctor'),
+                                        content: const Text(
+                                            'Are you sure you want to delete this doctor?'),
+                                        actions: [
+                                          TextButton(
+                                            child: const Text('Cancel'),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                          TextButton(
+                                            child: const Text('Delete'),
+                                            onPressed: () {
+                                              FirebaseFirestore.instance
+                                                  .collection('DoctorList')
+                                                  .doc(snapshot
+                                                      .data!.docs[index].id)
+                                                  .delete();
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                icon: const Icon(Icons.delete),
+                              ),
+                            ),
                         ],
                       ),
                     ),

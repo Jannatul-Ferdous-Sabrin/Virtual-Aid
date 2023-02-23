@@ -108,7 +108,7 @@ class _AppointmentListState extends State<AppointmentList> {
                                         child: const Text('Delete'),
                                         onPressed: () {
                                           FirebaseFirestore.instance
-                                              .collection('DoctorList')
+                                              .collection('DoctorAppointment')
                                               .doc(
                                                   snapshot.data!.docs[index].id)
                                               .delete();

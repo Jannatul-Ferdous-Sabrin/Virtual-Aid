@@ -2,105 +2,114 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
-import 'package:uuid/uuid.dart';
-import '../snackBarController.dart';
 
 class AddDoctor extends StatefulWidget {
   @override
-  State<AddDoctor> createState() => AddDoctorState();
+  _AddDoctorState createState() => _AddDoctorState();
 }
 
-class AddDoctorState extends State<AddDoctor> {
-  late String name;
-  late int age;
-  late String description;
-  late String doctorsID;
-  String specialistValue = 'Select Specialist';
-  String hospitalValue = 'Select Hospital';
+class _AddDoctorState extends State<AddDoctor> {
+  final GlobalKey<FormState> _formKey =
+      GlobalKey<FormState>(); //formkey for collecting the formdata
+  final TextEditingController controllerName = TextEditingController(); //
+  final TextEditingController controllerAge =
+      TextEditingController(); //  controller for TextFromField
+  final TextEditingController controllerDescription =
+      TextEditingController(); //
+  String? name; //
+  int? age; //
+  String? specialistValue; //  Variable for storing the data taken from user
+  String? hospitalValue; //
+  String? description; //
+  File? _image; //
 
-  final controllerName = TextEditingController();
-  final controllerAge = TextEditingController();
-  final controllerDesciption = TextEditingController();
+  //ImagePicker Function
+  Future pickDoctorImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final ImagePicker _picker = ImagePicker();
-  XFile? image;
-
-  void pickDoctorImage() async {
-    try {
-      final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
-
-      setState(() {
-        image = pickedImage!;
-      });
-    } catch (e) {}
-  }
-
-  Widget displayImage() {
-    return Image.file(File(image!.path));
-  }
-
-  // Future<void> uploadImage() async {
-  //   if (_formKey.currentState!.validate()) {
-  //     _formKey.currentState!.save();
-  //     if (image != null) {
-  //       try {
-  //         Reference ref =
-  //             _firebaseStorage.ref('DoctorsPhotos/${path.basename}');
-
-  //         await ref.putFile(File(image!.path)).whenComplete(() async {
-  //           await ref.getDownloadURL().then((value) {
-  //             imageUrlList.add(value);
-  //           });
-  //         });
-  //       } catch (e) {
-  //         print(e);
-  //       }
-  //       setState(() {
-  //         image = null;
-  //       });
-  //       _formKey.currentState!.reset();
-  //     } else {
-  //       snackBar('Please Pick Image', context);
-  //     }
-  //   } else {
-  //     snackBar('Fields must not be empty', context);
-  //   }
-  // }
-
-  Future<void> uploadImage() async {
-    Reference ref =
-        _firebaseStorage.ref('DoctorListPhotos/${path.basename(image!.path)}');
-
-    await ref.putFile(File(image!.path)).whenComplete(() async {
-      await ref.getDownloadURL().then((value) {
-        imageUrlList.add(value);
-      });
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
     });
   }
 
-  void uploadInfo() async {
-    CollectionReference infoRef = _firestore.collection('DoctorList');
-    doctorsID = const Uuid().v4();
-
-    await infoRef.doc(doctorsID).set({
-      'doctors ID': doctorsID,
-      'name': name,
-      'age': age,
-      'description': description,
-      'specialist': specialistValue,
-      'hospital': hospitalValue,
-      'doctorImage': imageUrlList,
-    }).whenComplete(() {});
+  //Display the image if image is selected
+  Widget displayImage() {
+    return CircleAvatar(
+      radius: 60,
+      backgroundImage: FileImage(_image!),
+    );
   }
 
-  void uploadDoctorInfo() async {
-    await uploadImage().whenComplete(uploadInfo);
+  //Upload doctor image to Firebase Storage
+  Future<String> uploadDoctorImage() async {
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child('DoctorListPhotos/');
+    UploadTask uploadTask = storageReference.putFile(_image!);
+    await uploadTask.whenComplete(() => null);
+    String doctorImageUrl = await storageReference.getDownloadURL();
+    return doctorImageUrl;
+  }
+
+// Uplaod doctor info to Firestore Database
+  Future<void> uploadDoctorInfo(String imageUrl) async {
+    FirebaseFirestore.instance.collection('DoctorList').doc().set(
+      {
+        'name': name,
+        'age': age,
+        'specialist': specialistValue,
+        'hospital': hospitalValue,
+        'description': description,
+        'doctorImage': imageUrl,
+      },
+    );
+  }
+
+  Future<void> uploadDoctorData() async {
+    if (_formKey.currentState!.validate()) {
+      if (_image == null) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text('Alert'),
+            content: const Text('Please pick an image.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        try {
+          String imageUrl = await uploadDoctorImage(); // First upload the image
+          await uploadDoctorInfo(imageUrl); // Then upload the doctor info
+        } catch (error) {
+          print(error);
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: const Text('Alert'),
+              content:
+                  const Text('Something went wrong. Please try again later.'),
+              actions: [
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -160,6 +169,7 @@ class AddDoctorState extends State<AddDoctor> {
             DropdownButton(
               borderRadius: BorderRadius.circular(30),
               value: specialistValue,
+              hint: const Text("Select Specialist"),
               items: specialistList.map<DropdownMenuItem<String>>((e) {
                 return DropdownMenuItem(
                   value: e,
@@ -175,6 +185,7 @@ class AddDoctorState extends State<AddDoctor> {
             DropdownButton(
               borderRadius: BorderRadius.circular(30),
               value: hospitalValue,
+              hint: const Text("Select Hospital"),
               items: hospitalList.map<DropdownMenuItem<String>>((e) {
                 return DropdownMenuItem(
                   value: e,
@@ -189,7 +200,7 @@ class AddDoctorState extends State<AddDoctor> {
             ),
             const SizedBox(height: 10),
             TextFormField(
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
               validator: (value) {
                 if (value!.isEmpty) {
                   return 'Please Description must not be empty';
@@ -199,7 +210,7 @@ class AddDoctorState extends State<AddDoctor> {
               },
               maxLength: 100,
               maxLines: 3,
-              controller: controllerDesciption,
+              controller: controllerDescription,
               decoration: const InputDecoration(
                 label: Text('Description'),
               ),
@@ -208,30 +219,24 @@ class AddDoctorState extends State<AddDoctor> {
               },
             ),
             const SizedBox(height: 10),
-            // CircleAvatar(
-            //   radius: 50,
-            //   backgroundImage: image != null ? FileImage(image) : null,
-            // ),
             InkWell(
-              onTap: () {
+              onLongPress: () {
                 setState(() {
-                  image = null;
+                  _image = null;
                 });
               },
-              child: Container(
-                padding: const EdgeInsetsDirectional.only(top: 60),
-                height: 150,
-                width: 150,
-                decoration: const BoxDecoration(
-                  color: Colors.blue,
-                  shape: BoxShape.circle,
-                ),
+              child: CircleAvatar(
+                radius: 75,
+                backgroundColor: Colors.blue,
                 child: Center(
-                  child: image != null
+                  child: _image != null
                       ? displayImage()
                       : const Text(
-                          'You have not pick any image',
-                          style: TextStyle(fontSize: 11),
+                          'You have not picked any image',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.black,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                 ),
@@ -248,7 +253,7 @@ class AddDoctorState extends State<AddDoctor> {
             ElevatedButton(
               child: const Text('Submit'),
               onPressed: () {
-                uploadDoctorInfo();
+                uploadDoctorData();
                 Navigator.pop(context);
               },
             ),
@@ -272,5 +277,3 @@ List<String> hospitalList = [
   'Mount-Adora',
   'Heart Foundation',
 ];
-
-List<String> imageUrlList = [];

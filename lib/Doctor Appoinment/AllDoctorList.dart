@@ -86,7 +86,7 @@ class _AllDoctorListState extends State<AllDoctorList> {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
                                 child: Image.network(
-                                  snapshot.data!.docs[index]['doctorImage'][0],
+                                  snapshot.data!.docs[index]['doctorImage'],
                                   height: 120,
                                   width: 120,
                                   fit: BoxFit.cover,
