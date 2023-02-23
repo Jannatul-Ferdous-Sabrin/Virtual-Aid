@@ -98,7 +98,7 @@ class BloodHome extends StatelessWidget {
                             Text(
                               user.email!,
                               style: const TextStyle(
-                                fontSize: 18,
+                                fontSize: 24,
                               ),
                             ),
                           ],
@@ -148,39 +148,40 @@ class BloodHome extends StatelessWidget {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 10),
                   GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 2,
-                        mainAxisSpacing: 5,
-                      ),
-                      itemCount: bloodGroup.length,
-                      itemBuilder: (context, index) {
-                        return InkWell(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) {
-                                  return DonorList();
-                                },
-                              ),
-                            );
-                          },
-                          child: CircleAvatar(
-                            backgroundColor: Colors.blue,
-                            child: Text(
-                              bloodGroup[index],
-                              style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 1.5,
+                      mainAxisSpacing: 10,
+                    ),
+                    itemCount: bloodGroup.length,
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) {
+                                return DonorList();
+                              },
+                            ),
+                          );
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          child: Text(
+                            bloodGroup[index],
+                            style: const TextStyle(
+                              color: Colors.red,
                             ),
                           ),
-                        );
-                      }),
-                  const SizedBox(height: 10),
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -194,10 +195,10 @@ class BloodHome extends StatelessWidget {
 List bloodGroup = [
   'A+',
   'A-',
-  'B+',
-  'B-',
   'AB+',
   'AB-',
+  'B+',
+  'B-',
   'O+',
   'O-',
 ];

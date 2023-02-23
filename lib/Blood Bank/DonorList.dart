@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import 'AddDonor.dart';
+
 class DonorList extends StatefulWidget {
   @override
   State<DonorList> createState() => _DonorListState();
@@ -8,6 +10,7 @@ class DonorList extends StatefulWidget {
 
 class _DonorListState extends State<DonorList> {
   late final Stream<QuerySnapshot> _DonorDetailsStream;
+
   @override
   void initState() {
     super.initState();
@@ -15,6 +18,7 @@ class _DonorListState extends State<DonorList> {
         FirebaseFirestore.instance.collection("DonorList").snapshots();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 243, 197, 193),
@@ -44,59 +48,63 @@ class _DonorListState extends State<DonorList> {
             );
           }
           return Material(
+            color: const Color.fromARGB(255, 243, 197, 193),
             child: ListView.builder(
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  height: 120,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              "Name",
-                              style: TextStyle(
-                                fontSize: 22,
-                                color: Colors.black,
+                return Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Container(
+                    height: 120,
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                snapshot.data!.docs[index]['name'],
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              "Age",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.black,
+                              const SizedBox(height: 5),
+                              Text(
+                                snapshot.data!.docs[index]['age'].toString(),
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              "Phone Number",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.black,
+                              const SizedBox(height: 5),
+                              Text(
+                                snapshot.data!.docs[index]['PhoneNumber'],
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(right: 50),
-                          child: Text(
-                            "AB+",
-                            style: TextStyle(
-                              fontSize: 24,
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 50),
+                            child: Text(
+                              snapshot.data!.docs[index]['BloodGroup'],
+                              style: const TextStyle(
+                                fontSize: 24,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -104,6 +112,19 @@ class _DonorListState extends State<DonorList> {
             ),
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.red,
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) {
+                return AddDonor();
+              },
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }

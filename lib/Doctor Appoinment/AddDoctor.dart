@@ -260,7 +260,6 @@ class AddDoctorState extends State<AddDoctor> {
 }
 
 List<String> specialistList = [
-  'Select Specialist',
   'Heart',
   'Brain',
   'Dental',
@@ -268,7 +267,6 @@ List<String> specialistList = [
 ];
 
 List<String> hospitalList = [
-  'Select Hospital',
   'Al-Haramain',
   'IBN-Sina',
   'Mount-Adora',
