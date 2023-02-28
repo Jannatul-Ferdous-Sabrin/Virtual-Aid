@@ -1,4 +1,4 @@
-// ignore_for_file: file_names, use_key_in_widget_constructors, non_constant_identifier_names
+// ignore_for_file: use_key_in_widget_constructors, file_names, non_constant_identifier_names
 
 import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,27 +8,19 @@ import 'package:flutter/material.dart';
 import '../snackBar.dart';
 import 'AddDonor.dart';
 
-class DonorList extends StatefulWidget {
-  final String bloodGroup;
-
-  const DonorList({
-    required this.bloodGroup,
-  });
-
+class AllDonorList extends StatefulWidget {
   @override
-  State<DonorList> createState() => _DonorListState();
+  State<AllDonorList> createState() => _AllDonorListState();
 }
 
-class _DonorListState extends State<DonorList> {
+class _AllDonorListState extends State<AllDonorList> {
   late final Stream<QuerySnapshot> _DonorDetailsStream;
 
   @override
   void initState() {
     super.initState();
-    _DonorDetailsStream = FirebaseFirestore.instance
-        .collection("DonorList")
-        .where('bloodgroup', isEqualTo: widget.bloodGroup)
-        .snapshots();
+    _DonorDetailsStream =
+        FirebaseFirestore.instance.collection("DonorList").snapshots();
   }
 
   @override
@@ -68,7 +60,7 @@ class _DonorListState extends State<DonorList> {
                 return Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Container(
-                    height: 130,
+                    height: 120,
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                       color: Colors.green.withOpacity(0.3),
@@ -122,11 +114,10 @@ class _DonorListState extends State<DonorList> {
                                 Text(
                                   snapshot.data!.docs[index]['bloodgroup'],
                                   style: TextStyle(
-                                    fontSize: 24,
-                                    color: Colors.red.withOpacity(0.9),
-                                  ),
+                                      fontSize: 24,
+                                      color: Colors.red.withOpacity(0.9)),
                                 ),
-                                const SizedBox(height: 0),
+                                const SizedBox(height: 10),
                                 Text(
                                   snapshot.data!.docs[index]['location'],
                                   style: const TextStyle(
@@ -160,7 +151,7 @@ class _DonorListState extends State<DonorList> {
                                             child: const Text('Delete'),
                                             onPressed: () {
                                               FirebaseFirestore.instance
-                                                  .collection('DonorList')
+                                                  .collection('DoctorList')
                                                   .doc(snapshot
                                                       .data!.docs[index].id)
                                                   .delete();

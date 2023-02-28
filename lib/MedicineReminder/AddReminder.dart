@@ -1,4 +1,8 @@
+// ignore_for_file: file_names, library_private_types_in_public_api, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, depend_on_referenced_packages
+
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddReminder extends StatefulWidget {
   @override
@@ -7,61 +11,43 @@ class AddReminder extends StatefulWidget {
 
 class _AddReminderState extends State<AddReminder> {
   final _formKey = GlobalKey<FormState>();
-  String _medicineName = '';
-  int _amountPerTime = 0;
+  String? medicineName;
+  int? amountPerTime;
+  TimeOfDay? selectedTime;
+  final List<String> days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-  final Map<String, bool> _selectedCheckboxes = {
-    'Breakfast': false,
-    'Lunch': false,
-    'Dinner': false,
-  };
+  //bool _isWeeklyRepeatOn = false;
 
-  void _updateSelectedCheckboxes(String key, bool value) {
-    setState(() {
-      _selectedCheckboxes[key] = value;
-    });
-  }
+  final List<bool> _isSelected = List.generate(7, (index) => false);
 
-  Map<String, TimeOfDay?> _selectedTimes = {
-    'Breakfast': null,
-    'Lunch': null,
-    'Dinner': null,
-  };
+  Future<void> saveReminder() async {
+    if (_formKey.currentState!.validate() && selectedTime != null) {
+      CollectionReference reminderRef =
+          FirebaseFirestore.instance.collection('MedicineReminderList');
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      print('Medicine name: $_medicineName');
-      print('Amount per time: $_amountPerTime');
-      print('Selected times: $_selectedTimes');
-    }
-  }
+      List<String> selectedDays = [];
 
-  void _showTimePicker(String key) async {
-    final initialTime = _selectedTimes[key] ?? TimeOfDay.now();
+      for (int i = 0; i < days.length; i++) {
+        if (_isSelected[i]) {
+          selectedDays.add(days[i]);
+        }
+      }
 
-    final pickedTime = await showTimePicker(
-      context: context,
-      initialTime: initialTime,
-      builder: (BuildContext context, Widget? child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
-        );
-      },
-    );
-
-    if (pickedTime != null) {
-      setState(() {
-        _selectedTimes = Map.from(_selectedTimes);
-        _selectedTimes[key] = pickedTime;
-        _selectedCheckboxes[key] = true;
+      await reminderRef.doc().set({
+        'medName': medicineName,
+        'amount': amountPerTime,
+        'dateTime': selectedTime!.format(context),
+        'days': selectedDays,
+        'userEmail': FirebaseAuth.instance.currentUser!.email,
       });
-    } else if (_selectedTimes.containsKey(key)) {
-      setState(() {
-        _selectedTimes = Map.from(_selectedTimes);
-        _selectedTimes.remove(key);
-        _selectedCheckboxes[key] = false;
-      });
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please fill in all fields and select time.'),
+          backgroundColor: Colors.red.withOpacity(0.8),
+        ),
+      );
     }
   }
 
@@ -81,15 +67,15 @@ class _AddReminderState extends State<AddReminder> {
           padding: const EdgeInsets.all(16),
           children: [
             TextFormField(
-              decoration: InputDecoration(labelText: 'Medicine Name'),
+              decoration: const InputDecoration(labelText: 'Medicine Name'),
               validator: (value) {
                 if (value!.isEmpty) {
-                  return 'Please enter the medicine name';
+                  return 'Please Enter the Medicine Name';
                 }
                 return null;
               },
               onChanged: (value) {
-                _medicineName = value;
+                medicineName = value;
               },
             ),
             TextFormField(
@@ -105,84 +91,80 @@ class _AddReminderState extends State<AddReminder> {
                 return null;
               },
               onChanged: (value) {
-                _amountPerTime = int.tryParse(value) ?? 0;
+                amountPerTime = int.tryParse(value) ?? 0;
               },
             ),
             const SizedBox(height: 16),
             const Text('Select times:'),
-            CheckboxListTile(
-              title: const Text('Breakfast'),
-              value: _selectedCheckboxes['Breakfast'],
-              onChanged: (value) {
-                _updateSelectedCheckboxes('Breakfast', value!);
-                if (value) {
-                  _showTimePicker('Breakfast');
-                } else {
-                  setState(() {
-                    _selectedTimes.remove('Breakfast');
-                  });
-                }
-              },
-            ),
-            if (_selectedTimes.containsKey('Breakfast'))
-              ListTile(
-                leading: const Icon(Icons.access_time),
-                title: Text(
-                    'Time: ${_selectedTimes['Breakfast']?.format(context) ?? ""}'),
-                onTap: () {
-                  _showTimePicker('Breakfast');
-                },
-              ),
-            CheckboxListTile(
-              title: const Text('Lunch'),
-              value: _selectedCheckboxes['Lunch'],
-              onChanged: (value) {
-                _updateSelectedCheckboxes('Lunch', value!);
-                if (value) {
-                  _showTimePicker('Lunch');
-                } else {
-                  setState(() {
-                    _selectedTimes.remove('Lunch');
-                  });
-                }
-              },
-            ),
-            if (_selectedTimes.containsKey('Lunch'))
-              ListTile(
-                leading: const Icon(Icons.access_time),
-                title: Text(
-                    'Time: ${_selectedTimes['Lunch']?.format(context) ?? ""}'),
-                onTap: () {
-                  _showTimePicker('Lunch');
-                },
-              ),
-            CheckboxListTile(
-              title: const Text('Dinner'),
-              value: _selectedCheckboxes['Dinner'],
-              onChanged: (value) {
-                _updateSelectedCheckboxes('Dinner', value!);
-                if (value) {
-                  _showTimePicker('Dinner');
-                } else {
-                  setState(() {
-                    _selectedTimes.remove('Dinner');
-                  });
-                }
-              },
-            ),
-            if (_selectedTimes.containsKey('Dinner'))
-              ListTile(
-                leading: const Icon(Icons.access_time),
-                title: Text(
-                    'Time: ${_selectedTimes['Dinner']?.format(context) ?? ""}'),
-                onTap: () {
-                  _showTimePicker('Dinner');
-                },
-              ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _submitForm,
-              child: const Text('Save'),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () async {
+                        final pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (pickedTime != null) {
+                          setState(() {
+                            selectedTime = pickedTime;
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.access_time),
+                      tooltip: 'Select Time',
+                    ),
+                    if (selectedTime != null)
+                      Text(
+                        selectedTime!.format(context),
+                      ),
+                  ],
+                ),
+                const SizedBox(width: 16),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ToggleButtons(
+              isSelected: _isSelected,
+              onPressed: (int index) {
+                setState(() {
+                  _isSelected[index] = !_isSelected[index];
+                });
+              },
+              children: days.map((day) => Text(day)).toList(),
+            ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.end,
+            //   children: [
+            //     const Text('Repeat Weekly:'),
+            //     IconButton(
+            //       icon: _isWeeklyRepeatOn
+            //           ? const Icon(Icons.check_box_rounded)
+            //           : const Icon(Icons.square_outlined),
+            //       onPressed: () {
+            //         setState(() {
+            //           _isWeeklyRepeatOn = !_isWeeklyRepeatOn;
+            //         });
+            //       },
+            //     ),
+            //   ],
+            // ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.all(40.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  saveReminder();
+                },
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.green),
+                ),
+                child: const Text('Save'),
+              ),
             ),
           ],
         ),

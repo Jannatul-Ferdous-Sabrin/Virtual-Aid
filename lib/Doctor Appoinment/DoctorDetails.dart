@@ -1,7 +1,8 @@
+// ignore_for_file: file_names, use_key_in_widget_constructors
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 
 class DoctorDetails extends StatelessWidget {
   final QueryDocumentSnapshot<Object?> doctorDetails;
@@ -17,17 +18,15 @@ class DoctorDetails extends StatelessWidget {
 
     if (userEmail != null) {
       // Create a new document in the DoctorAppointment collection with the appointment information
-      FirebaseFirestore.instance
-          .collection('DoctorAppointment')
-          .add({
-            'dateTime': selectedDateTime,
-            'doctorName': doctorName,
-            'hospitalName': hospitalName,
-            'specialistName': specialistName,
-            'userEmail': userEmail,
-          })
-          .then((value) => print("Appointment saved"))
-          .catchError((error) => print("Failed to save appointment: $error"));
+      FirebaseFirestore.instance.collection('RequestAppointment').add(
+        {
+          'dateTime': selectedDateTime,
+          'doctorName': doctorName,
+          'hospitalName': hospitalName,
+          'specialistName': specialistName,
+          'userEmail': userEmail,
+        },
+      );
     }
   }
 
@@ -36,47 +35,49 @@ class DoctorDetails extends StatelessWidget {
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
+      lastDate: DateTime.now(),
     ).then((selectedDate) {
       if (selectedDate != null) {
         showTimePicker(
           context: context,
           initialTime: TimeOfDay.now(),
-        ).then((selectedTime) {
-          if (selectedTime != null) {
-            DateTime selectedDateTime = DateTime(
-              selectedDate.year,
-              selectedDate.month,
-              selectedDate.day,
-              selectedTime.hour,
-              selectedTime.minute,
-            );
-            print('Selected date and time: $selectedDateTime');
+        ).then(
+          (selectedTime) {
+            if (selectedTime != null) {
+              DateTime selectedDateTime = DateTime(
+                selectedDate.year,
+                selectedDate.month,
+                selectedDate.day,
+                selectedTime.hour,
+                selectedTime.minute,
+              );
+              //print('Selected date and time: $selectedDateTime');
 
-            saveAppointment(selectedDateTime, doctorDetails['name'],
-                doctorDetails['hospital'], doctorDetails['specialist']);
+              saveAppointment(selectedDateTime, doctorDetails['name'],
+                  doctorDetails['hospital'], doctorDetails['specialist']);
 
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  backgroundColor: const Color(0xFFD9E4EE),
-                  title: const Text('Appointment Booked'),
-                  content: Text(
-                      'Your appointment has been booked for $selectedDateTime'),
-                  actions: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('OK'),
-                    ),
-                  ],
-                );
-              },
-            );
-          }
-        });
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    backgroundColor: const Color(0xFFD9E4EE),
+                    title: const Text('Appointment Requested'),
+                    content: Text(
+                        'Your appointment has been requested for $selectedDateTime. Please wait for the admin to assign it.'),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            }
+          },
+        );
       }
     });
   }
@@ -156,26 +157,6 @@ class DoctorDetails extends StatelessWidget {
                               fontWeight: FontWeight.w400,
                               color: Colors.black,
                             ),
-                          ),
-                          Row(
-                            children: [
-                              const Text(
-                                'Experience: ',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              Text(
-                                doctorDetails['age'].toString(),
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
                           ),
                         ],
                       ),

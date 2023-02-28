@@ -1,20 +1,21 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// ignore_for_file: file_names, use_key_in_widget_constructors
+
 import 'package:flutter/material.dart';
-import 'LoginWidget.dart';
-import 'SignUpWidget.dart';
+
+import 'SignIn.dart';
+import 'SignUp.dart';
 
 class AuthPage extends StatefulWidget {
   @override
-  _AuthPageState createState() => _AuthPageState();
+  State<AuthPage> createState() => _AuthPageState();
 }
 
 class _AuthPageState extends State<AuthPage> {
   bool isLogin = true;
-
   @override
   Widget build(BuildContext context) => isLogin
-      ? LoginWidget(onClickedSignUp: toggle)
-      : SignUpWidget(onClickedSignIn: toggle);
+      ? SignIn(onClickedSignUp: toogle)
+      : SignUp(onClickedSignIn: toogle);
 
-  void toggle() => setState(() => isLogin = !isLogin);
+  void toogle() => setState(() => isLogin = !isLogin);
 }

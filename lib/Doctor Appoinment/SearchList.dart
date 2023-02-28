@@ -1,3 +1,5 @@
+// ignore_for_file: use_key_in_widget_constructors, file_names
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -9,34 +11,7 @@ class SearchList extends StatefulWidget {
 }
 
 class _SearchListState extends State<SearchList> {
-  final FirebaseFirestore _ref = FirebaseFirestore.instance;
-  late List<QueryDocumentSnapshot<Map<String, dynamic>>> _searchResult = [];
-  bool _isLoading = false;
-
-  Future<void> _searchDoctors(String searchQuery) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    if (searchQuery.isEmpty) {
-      setState(() {
-        _isLoading = false;
-        _searchResult = [];
-      });
-      return;
-    }
-
-    QuerySnapshot<Map<String, dynamic>> querySnapshot = await _ref
-        .collection('DoctorList')
-        .where('name', isEqualTo: searchQuery)
-        //.where('name', isLessThanOrEqualTo: searchQuery)
-        .get();
-
-    setState(() {
-      _isLoading = false;
-      _searchResult = querySnapshot.docs;
-    });
-  }
+  final _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -47,70 +22,73 @@ class _SearchListState extends State<SearchList> {
       ),
       body: Column(
         children: [
-          Container(
-            margin: const EdgeInsets.all(10),
-            width: MediaQuery.of(context).size.width,
-            height: 60,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Colors.white70,
-              borderRadius: BorderRadius.circular(40),
-            ),
-            child: TextFormField(
-              onChanged: (value) => _searchDoctors(value),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: TextField(
+              controller: _searchController,
               decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: "   Search for Doctors......",
-                hintStyle: TextStyle(
-                  color: Colors.black.withOpacity(0.3),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
-                prefixIcon: const Icon(
-                  Icons.search,
-                  size: 20,
-                ),
+                hintText: "Search for Doctors...",
+                prefixIcon: const Icon(Icons.search),
               ),
+              onChanged: (value) => setState(() {}),
             ),
           ),
-          if (_isLoading)
-            const Center(child: CircularProgressIndicator())
-          else if (_searchResult.isEmpty)
-            const Center(child: Text('No results found.'))
-          else
-            Expanded(
-              child: ListView.builder(
-                itemCount: _searchResult.length,
-                itemBuilder: (context, index) {
-                  final doctor = _searchResult[index].data();
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DoctorDetails(
-                            doctorDetails: _searchResult[index],
-                          ),
-                        ),
-                      );
-                    },
-                    child: Container(
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('DoctorList')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final searchResults = snapshot.data!.docs.where((doc) {
+                  final name = doc.get('name').toString().toLowerCase();
+                  final query = _searchController.text.toLowerCase();
+                  return name.contains(query);
+                }).toList();
+
+                if (searchResults.isEmpty) {
+                  return const Center(child: Text('No results found.'));
+                }
+
+                return ListView.builder(
+                  itemCount: searchResults.length,
+                  itemBuilder: (context, index) {
+                    final doctorDetails = searchResults[index];
+                    final name = doctorDetails.get('name');
+                    final specialist = doctorDetails.get('specialist');
+                    final hospital = doctorDetails.get('hospital');
+
+                    return Container(
                       margin: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
+                          horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: ListTile(
-                        title: Text(doctor['name']),
-                        subtitle: Text(doctor['specialist']),
-                        trailing: Text(doctor['hospital']),
+                        title: Text(name),
+                        subtitle: Text(specialist),
+                        trailing: Text(hospital),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                DoctorDetails(doctorDetails: doctorDetails),
+                          ),
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                );
+              },
             ),
+          ),
         ],
       ),
     );

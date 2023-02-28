@@ -1,3 +1,5 @@
+// ignore_for_file: file_names, camel_case_types, use_key_in_widget_constructors, non_constant_identifier_names
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'DoctorDetails.dart';
 
 class speDoctorList extends StatefulWidget {
   final String specialistName;
+
   speDoctorList({
     required this.specialistName,
   });
@@ -28,7 +31,6 @@ class _speDoctorListState extends State<speDoctorList> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser!;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Doctor List'),
@@ -105,27 +107,27 @@ class _speDoctorListState extends State<speDoctorList> {
                                   Text(
                                     snapshot.data!.docs[index]['name'],
                                     style: const TextStyle(
-                                      fontSize: 28,
+                                      fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   Text(
                                     snapshot.data!.docs[index]['specialist'],
                                     style: const TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 17,
                                     ),
                                   ),
                                   Text(
                                     snapshot.data!.docs[index]['hospital'],
                                     style: const TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 17,
                                     ),
                                   ),
                                   Text(
                                     snapshot.data!.docs[index]['age']
                                         .toString(),
                                     style: const TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 17,
                                     ),
                                   ),
                                 ],
@@ -133,7 +135,7 @@ class _speDoctorListState extends State<speDoctorList> {
                             ],
                           ),
                           if (FirebaseAuth.instance.currentUser!.email ==
-                              'admin@gmail.com')
+                              'nimda884@gmail.com')
                             Align(
                               alignment: Alignment.bottomRight,
                               child: IconButton(
@@ -182,7 +184,7 @@ class _speDoctorListState extends State<speDoctorList> {
         },
       ),
       floatingActionButton:
-          FirebaseAuth.instance.currentUser!.email == 'admin@gmail.com'
+          FirebaseAuth.instance.currentUser!.email == 'nimda884@gmail.com'
               ? FloatingActionButton(
                   backgroundColor: Colors.blue,
                   onPressed: () {

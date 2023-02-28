@@ -1,14 +1,16 @@
+// ignore_for_file: depend_on_referenced_packages, use_key_in_widget_constructors
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '/Doctor Appoinment/HomeScreen.dart';
-//import 'Homepage/BottomMenuPage.dart';
 import 'Authentication/AuthPage.dart';
 import 'Homepage/HomePage.dart';
-import 'Doctor Appoinment/DoctorDetails.dart';
+import 'snackBar.dart';
+//import '/Doctor Appoinment/HomeScreen.dart';
+//import 'Doctor Appoinment/DoctorDetails.dart';
 
-final navigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,14 +31,12 @@ Future main() async {
 //         ),
 //         //useMaterial3: true,
 //       ),
-//       home: DoctorDetails(),
+//       home: HomePage(),
 //     );
 //   }
 // }
 
 class MyApp extends StatelessWidget {
-  static const String title = 'Firebase Auth';
-
   @override
   Widget build(BuildContext context) => MaterialApp(
         navigatorKey: navigatorKey,
@@ -60,9 +60,16 @@ class MainPage extends StatelessWidget {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              return const Center(child: Text('Something went wrong!'));
+              return const Center(
+                child: Text('Something went wrong!'),
+              );
             } else if (snapshot.hasData) {
-              return HomePage();
+              final user = snapshot.data!;
+              if (user.emailVerified) {
+                return HomePage();
+              } else {
+                return AuthPage();
+              }
             } else {
               return AuthPage();
             }

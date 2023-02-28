@@ -1,3 +1,5 @@
+// ignore_for_file: file_names, use_key_in_widget_constructors
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +18,7 @@ class _AppointmentListState extends State<AppointmentList> {
         title: const Text('Appointments'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseAuth.instance.currentUser!.email == 'admin@gmail.com'
+        stream: FirebaseAuth.instance.currentUser!.email == 'nimda884@gmail.com'
             ? FirebaseFirestore.instance
                 .collection('DoctorAppointment')
                 .snapshots()
@@ -85,7 +87,7 @@ class _AppointmentListState extends State<AppointmentList> {
                         ),
                       ),
                       if (FirebaseAuth.instance.currentUser!.email ==
-                          'admin@gmail.com')
+                          'nimda884@gmail.com')
                         Align(
                           alignment: Alignment.bottomRight,
                           child: IconButton(
@@ -96,7 +98,7 @@ class _AppointmentListState extends State<AppointmentList> {
                                   return AlertDialog(
                                     title: const Text('Delete Doctor'),
                                     content: const Text(
-                                        'Are you sure you want to delete this doctor?'),
+                                        'Are you sure you want to delete this Appointment?'),
                                     actions: [
                                       TextButton(
                                         child: const Text('Cancel'),
